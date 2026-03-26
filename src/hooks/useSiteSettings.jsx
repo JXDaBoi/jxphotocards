@@ -6,6 +6,8 @@ const defaultSettings = {
   showcaseMode: false,
   dashboardEnabled: true,
   forceTheme: 'user', // "user", "light", "dark", "pastel"
+  valueTrackerEnabled: false,
+  tradeGeneratorEnabled: true,
 };
 
 export function useSiteSettings() {

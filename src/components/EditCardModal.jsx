@@ -9,6 +9,7 @@ export default function EditCardModal({ card, onClose }) {
   const [member, setMember] = useState(card.member || '');
   const [tagsInput, setTagsInput] = useState(card.tags?.join(', ') || '');
   const [status, setStatus] = useState(card.status || 'Owned');
+  const [price, setPrice] = useState(card.price || '');
   const [uploading, setUploading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -16,7 +17,7 @@ export default function EditCardModal({ card, onClose }) {
     setUploading(true);
     try {
       const tags = tagsInput.split(',').map(tag => tag.trim()).filter(Boolean);
-      await updatePhotocard(card.id, { name, group, member, tags, status });
+      await updatePhotocard(card.id, { name, group, member, tags, status, price });
       onClose();
     } catch (err) {
       alert("Error updating photocard: " + err.message);
@@ -38,12 +39,15 @@ export default function EditCardModal({ card, onClose }) {
                 <input type="text" placeholder="Member Name" value={member} onChange={e => setMember(e.target.value)} className="input-field" />
                 <input type="text" placeholder="Tags (comma separated)" value={tagsInput} onChange={e => setTagsInput(e.target.value)} className="input-field" />
                 
-                <select value={status} onChange={e => setStatus(e.target.value)} className="input-field" style={{ cursor: 'pointer' }}>
-                  <option value="Owned">✅ Owned</option>
-                  <option value="Wishlist">💖 Wishlist</option>
-                  <option value="On the Way">🚚 On the Way</option>
-                  <option value="Traded">🔄 Traded</option>
-                </select>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <input type="number" step="0.01" min="0" placeholder="Est. Value / Price" value={price} onChange={e => setPrice(e.target.value)} className="input-field" />
+                  <select value={status} onChange={e => setStatus(e.target.value)} className="input-field" style={{ cursor: 'pointer' }}>
+                    <option value="Owned">✅ Owned</option>
+                    <option value="Wishlist">💖 Wishlist</option>
+                    <option value="On the Way">🚚 On the Way</option>
+                    <option value="Traded">🔄 Traded</option>
+                  </select>
+                </div>
             </div>
           </div>
           

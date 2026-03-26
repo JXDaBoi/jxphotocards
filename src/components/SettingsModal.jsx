@@ -7,6 +7,8 @@ export default function SettingsModal({ onClose }) {
   const [showcaseMode, setShowcaseMode] = useState(settings.showcaseMode);
   const [dashboardEnabled, setDashboardEnabled] = useState(settings.dashboardEnabled);
   const [forceTheme, setForceTheme] = useState(settings.forceTheme);
+  const [valueTrackerEnabled, setValueTrackerEnabled] = useState(settings.valueTrackerEnabled);
+  const [tradeGeneratorEnabled, setTradeGeneratorEnabled] = useState(settings.tradeGeneratorEnabled);
   const [saving, setSaving] = useState(false);
 
   // Sync to remote changes just in case
@@ -14,6 +16,8 @@ export default function SettingsModal({ onClose }) {
     setShowcaseMode(settings.showcaseMode);
     setDashboardEnabled(settings.dashboardEnabled);
     setForceTheme(settings.forceTheme);
+    setValueTrackerEnabled(settings.valueTrackerEnabled);
+    setTradeGeneratorEnabled(settings.tradeGeneratorEnabled);
   }, [settings]);
 
   const handleSave = async () => {
@@ -22,7 +26,9 @@ export default function SettingsModal({ onClose }) {
       await updateSettings({
         showcaseMode,
         dashboardEnabled,
-        forceTheme
+        forceTheme,
+        valueTrackerEnabled,
+        tradeGeneratorEnabled
       });
       onClose();
     } catch (err) {
@@ -68,12 +74,34 @@ export default function SettingsModal({ onClose }) {
               <h4 style={{ marginBottom: '0.2rem' }}>Force Public Theme</h4>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Lock all visitors into a specific visual aesthetic.</p>
             </div>
-            <select value={forceTheme} onChange={(e) => setForceTheme(e.target.value)} className="input-field" style={{ width: '150px' }}>
+            <select value={forceTheme} onChange={(e) => setForceTheme(e.target.value)} className="input-field" style={{ width: '150px', marginBottom: 0 }}>
               <option value="user">User Choice</option>
               <option value="light">☀️ Light</option>
               <option value="dark">🌙 Dark</option>
               <option value="pastel">🌸 Pastel</option>
             </select>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h4 style={{ marginBottom: '0.2rem' }}>Portfolio Value Tracker</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Displays total valuation on the dashboard.</p>
+            </div>
+            <label className="switch">
+              <input type="checkbox" checked={valueTrackerEnabled} onChange={(e) => setValueTrackerEnabled(e.target.checked)} />
+              <span className="slider round"></span>
+            </label>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h4 style={{ marginBottom: '0.2rem' }}>Public Trade Generator</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Visitors can click a button to copy a trade DM template.</p>
+            </div>
+            <label className="switch">
+              <input type="checkbox" checked={tradeGeneratorEnabled} onChange={(e) => setTradeGeneratorEnabled(e.target.checked)} />
+              <span className="slider round"></span>
+            </label>
           </div>
 
         </div>

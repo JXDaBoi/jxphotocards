@@ -23,6 +23,7 @@ export default function AddCardModal({ onClose }) {
   const [member, setMember] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [status, setStatus] = useState('Owned');
+  const [price, setPrice] = useState('');
 
   const onFileChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -65,7 +66,7 @@ export default function AddCardModal({ onClose }) {
       const fileToUpload = new File([croppedBlob], `photocard_${Date.now()}.jpg`, { type: 'image/jpeg' });
       const imageUrl = await uploadImageToCloudinary(fileToUpload);
       const tags = tagsInput.split(',').map(tag => tag.trim()).filter(Boolean);
-      await addPhotocard({ name, group, member, tags, status, imageUrl });
+      await addPhotocard({ name, group, member, tags, status, price, imageUrl });
       onClose();
     } catch (err) {
       alert("Error: " + err.message);
@@ -149,12 +150,15 @@ export default function AddCardModal({ onClose }) {
               <input type="text" placeholder="Member (e.g. Irene)" value={member} onChange={e => setMember(e.target.value)} className="input-field" />
               <input type="text" placeholder="Tags (comma separated, e.g. Selfie, Rare)" value={tagsInput} onChange={e => setTagsInput(e.target.value)} className="input-field" />
               
-              <select value={status} onChange={e => setStatus(e.target.value)} className="input-field" style={{ cursor: 'pointer' }}>
-                  <option value="Owned">✅ Owned</option>
-                  <option value="Wishlist">💖 Wishlist</option>
-                  <option value="On the Way">🚚 On the Way</option>
-                  <option value="Traded">🔄 Traded</option>
-              </select>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <input type="number" step="0.01" min="0" placeholder="Est. Value (e.g. 15.50)" value={price} onChange={e => setPrice(e.target.value)} className="input-field" />
+                <select value={status} onChange={e => setStatus(e.target.value)} className="input-field" style={{ cursor: 'pointer' }}>
+                    <option value="Owned">✅ Owned</option>
+                    <option value="Wishlist">💖 Wishlist</option>
+                    <option value="On the Way">🚚 On the Way</option>
+                    <option value="Traded">🔄 Traded</option>
+                </select>
+              </div>
 
               <div className="modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'space-between', marginTop: '1rem' }}>
                 <button type="button" onClick={() => setStep('crop')} className="btn-secondary" disabled={uploading}>Back</button>

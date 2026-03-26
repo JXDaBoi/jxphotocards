@@ -1,5 +1,7 @@
-export default function Dashboard({ photocards }) {
+export default function Dashboard({ photocards, globalSettings }) {
   const total = photocards.length;
+  
+  const totalValue = photocards.reduce((acc, card) => acc + (parseFloat(card.price) || 0), 0);
   
   const stats = photocards.reduce((acc, card) => {
     const status = card.status || 'Owned';
@@ -27,6 +29,12 @@ export default function Dashboard({ photocards }) {
         <h4>{stats['On the Way'] || 0}</h4>
         <p>Incoming</p>
       </div>
+      {globalSettings?.valueTrackerEnabled && (
+        <div className="stat-box" style={{ color: '#10b981' }}>
+          <h4>${totalValue.toFixed(2)}</h4>
+          <p>Est. Value</p>
+        </div>
+      )}
       <div className="stat-box">
         <h4>{groups.size}</h4>
         <p>Unique Groups</p>

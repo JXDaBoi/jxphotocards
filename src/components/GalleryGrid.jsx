@@ -54,7 +54,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
   return (
     <>
       {globalSettings.dashboardEnabled && !globalSettings.showcaseMode && (
-        <Dashboard photocards={photocards} />
+        <Dashboard photocards={photocards} globalSettings={globalSettings} />
       )}
       
       {!globalSettings.showcaseMode && (
@@ -110,6 +110,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
                   card={card} 
                   onDelete={currentUser && !batchMode ? () => deletePhotocard(card.id) : null} 
                   onEdit={currentUser && !batchMode ? () => setEditingCard(card) : null}
+                  globalSettings={globalSettings}
                 />
               </div>
             );

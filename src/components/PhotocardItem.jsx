@@ -1,4 +1,4 @@
-export default function PhotocardItem({ card, onDelete, onEdit }) {
+export default function PhotocardItem({ card, onDelete, onEdit, globalSettings }) {
   const statusColors = {
     'Owned': 'var(--accent)',
     'Wishlist': '#ec4899',
@@ -8,11 +8,21 @@ export default function PhotocardItem({ card, onDelete, onEdit }) {
 
   const statusColor = statusColors[card.status || 'Owned'];
 
+  const handleTrade = (e) => {
+    e.stopPropagation();
+    const text = `Hi! I saw your Photocard Database. I am interested in trading for your ${card.name} (${card.group || ''} ${card.member || ''}). Let's talk!`;
+    navigator.clipboard.writeText(text);
+    alert('✅ Trade request format copied to your clipboard!');
+  };
+
   return (
     <div className="photocard-item glass-panel">
       <div className="image-wrapper">
         <img src={card.imageUrl} alt={card.name} loading="lazy" />
         <div className="card-actions">
+            {globalSettings?.tradeGeneratorEnabled && (card.status === 'Traded' || card.status === 'Wishlist' || card.status === 'Owned') && (
+              <button className="action-btn trade-btn" onClick={handleTrade} title="Propose Trade">🤝</button>
+            )}
             {onEdit && (
               <button className="action-btn edit-btn" onClick={onEdit} title="Edit Card">✏️</button>
             )}
