@@ -6,7 +6,7 @@ import FilterBar from './FilterBar';
 import Dashboard from './Dashboard';
 import { useState, useMemo } from 'react';
 
-export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, globalSettings }) {
+export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, globalSettings, isAdminView }) {
   const { photocards, loading, deletePhotocard, updatePhotocard } = usePhotocards();
   const { currentUser } = useAuth();
   const [editingCard, setEditingCard] = useState(null);
@@ -63,7 +63,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
             <button className="btn-secondary" onClick={() => setFiltersOpen(!filtersOpen)}>
               {filtersOpen ? 'Hide Filters ➖' : '🔍 Expand Search & Filters'}
             </button>
-            {currentUser && (
+            {currentUser && isAdminView && (
               <button 
                 className={`btn-secondary ${batchMode ? 'active' : ''}`} 
                 onClick={() => { setBatchMode(!batchMode); setSelectedCards(new Set()); }}
@@ -108,8 +108,8 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
                  )}
                 <PhotocardItem 
                   card={card} 
-                  onDelete={currentUser && !batchMode ? () => deletePhotocard(card.id) : null} 
-                  onEdit={currentUser && !batchMode ? () => setEditingCard(card) : null}
+                  onDelete={currentUser && isAdminView && !batchMode ? () => deletePhotocard(card.id) : null} 
+                  onEdit={currentUser && isAdminView && !batchMode ? () => setEditingCard(card) : null}
                   globalSettings={globalSettings}
                 />
               </div>

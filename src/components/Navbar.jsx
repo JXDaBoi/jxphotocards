@@ -1,28 +1,18 @@
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
 import SettingsModal from './SettingsModal';
+import { Link } from 'react-router-dom';
 
-export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTheme }) {
-  const { currentUser, logout, login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showLogin, setShowLogin] = useState(false);
+export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTheme, showAdminControls }) {
+  const { logout } = useAuth();
   const [showSettings, setShowSettings] = useState(false);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
-      setShowLogin(false);
-    } catch (err) {
-      alert("Login failed: " + err.message);
-    }
-  };
 
   return (
     <>
       <nav className="glass-panel navbar">
-        <h1 className="logo">✨ Photocard Gallery</h1>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <h1 className="logo">✨ Photocard Gallery</h1>
+        </Link>
         
         <div className="nav-controls">
           {!isForcedTheme && (
@@ -34,48 +24,18 @@ export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTh
           )}
 
           <div className="auth-controls" style={{ display: 'flex', gap: '0.8rem' }}>
-            {currentUser ? (
+            {showAdminControls ? (
               <>
                 <button className="btn-secondary" onClick={() => setShowSettings(true)}>⚙️ Site Settings</button>
                 <button className="btn-primary" onClick={() => setShowAddModal(true)}>+ Add Card</button>
                 <button className="btn-secondary" onClick={logout}>Logout</button>
               </>
             ) : (
-              <button className="btn-secondary" onClick={() => setShowLogin(true)}>Admin Login</button>
+               <Link to="/admin" className="btn-secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>🛡️ Admin Gateway</Link>
             )}
           </div>
         </div>
       </nav>
-
-      {showLogin && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ maxWidth: '400px' }}>
-            <h2>Admin Login</h2>
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-              <input 
-                type="email" 
-                placeholder="Admin Email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-                className="input-field"
-              />
-              <input 
-                type="password" 
-                placeholder="Password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
-                className="input-field"
-              />
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                <button type="button" className="btn-secondary" onClick={() => setShowLogin(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Login</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </>
