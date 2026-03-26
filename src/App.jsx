@@ -2,34 +2,48 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import GalleryGrid from './components/GalleryGrid';
 import AddCardModal from './components/AddCardModal';
-import FilterBar from './components/FilterBar';
+import { useSiteSettings } from './hooks/useSiteSettings';
 import './index.css';
 
 function App() {
+  const { settings, loading } = useSiteSettings();
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('photocard-theme') || 'light';
   });
   const [showAddModal, setShowAddModal] = useState(false);
   
   // Filter States
-  const [showcaseMode, setShowcaseMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [groupFilter, setGroupFilter] = useState('All');
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (showcaseMode) {
+    if (loading) return;
+
+    const activeTheme = settings.forceTheme !== 'user' ? settings.forceTheme : theme;
+    document.documentElement.setAttribute('data-theme', activeTheme);
+    
+    if (settings.showcaseMode) {
       document.body.classList.add('showcase-active');
     } else {
       document.body.classList.remove('showcase-active');
     }
-    localStorage.setItem('photocard-theme', theme);
-  }, [theme, showcaseMode]);
+    
+    if (settings.forceTheme === 'user') {
+      localStorage.setItem('photocard-theme', activeTheme);
+    }
+  }, [theme, settings.showcaseMode, settings.forceTheme, loading]);
+
+  if (loading) return null; // Avoid render flash
 
   return (
     <div className="app-container">
-      <Navbar theme={theme} toggleTheme={setTheme} setShowAddModal={setShowAddModal} />
+      <Navbar 
+        theme={theme} 
+        toggleTheme={setTheme} 
+        setShowAddModal={setShowAddModal} 
+        isForcedTheme={settings.forceTheme !== 'user'} 
+      />
 
       <main>
         <GalleryGrid 
@@ -39,8 +53,7 @@ function App() {
           setSearchQuery={setSearchQuery}
           setStatusFilter={setStatusFilter}
           setGroupFilter={setGroupFilter}
-          showcaseMode={showcaseMode}
-          setShowcaseMode={setShowcaseMode}
+          globalSettings={settings}
         />
       </main>
 

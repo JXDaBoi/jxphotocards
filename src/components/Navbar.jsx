@@ -1,11 +1,13 @@
 import { useAuth } from '../hooks/useAuth';
 import { useState } from 'react';
+import SettingsModal from './SettingsModal';
 
-export default function Navbar({ theme, toggleTheme, setShowAddModal }) {
+export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTheme }) {
   const { currentUser, logout, login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showLogin, setShowLogin] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,17 +25,20 @@ export default function Navbar({ theme, toggleTheme, setShowAddModal }) {
         <h1 className="logo">✨ Photocard Gallery</h1>
         
         <div className="nav-controls">
-          <div className="theme-toggles">
-            <button onClick={() => toggleTheme('light')} className={theme === 'light' ? 'active' : ''}>☀️ Light</button>
-            <button onClick={() => toggleTheme('dark')} className={theme === 'dark' ? 'active' : ''}>🌙 Dark</button>
-            <button onClick={() => toggleTheme('pastel')} className={theme === 'pastel' ? 'active' : ''}>🌸 Pastel</button>
-          </div>
+          {!isForcedTheme && (
+            <div className="theme-toggles">
+              <button onClick={() => toggleTheme('light')} className={theme === 'light' ? 'active' : ''}>☀️ Light</button>
+              <button onClick={() => toggleTheme('dark')} className={theme === 'dark' ? 'active' : ''}>🌙 Dark</button>
+              <button onClick={() => toggleTheme('pastel')} className={theme === 'pastel' ? 'active' : ''}>🌸 Pastel</button>
+            </div>
+          )}
 
-          <div className="auth-controls">
+          <div className="auth-controls" style={{ display: 'flex', gap: '0.8rem' }}>
             {currentUser ? (
               <>
+                <button className="btn-secondary" onClick={() => setShowSettings(true)}>⚙️ Site Settings</button>
                 <button className="btn-primary" onClick={() => setShowAddModal(true)}>+ Add Card</button>
-                <button className="btn-secondary" onClick={logout}>Logout Admin</button>
+                <button className="btn-secondary" onClick={logout}>Logout</button>
               </>
             ) : (
               <button className="btn-secondary" onClick={() => setShowLogin(true)}>Admin Login</button>
@@ -71,6 +76,8 @@ export default function Navbar({ theme, toggleTheme, setShowAddModal }) {
           </div>
         </div>
       )}
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </>
   );
 }
