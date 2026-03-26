@@ -53,9 +53,9 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
   };
 
   return (
-    <div className={isAdminView && !globalSettings.showcaseMode ? 'dashboard-layout' : ''}>
+    <div className={!globalSettings.showcaseMode ? 'dashboard-layout' : ''}>
       
-      {!globalSettings.showcaseMode && isAdminView && (
+      {!globalSettings.showcaseMode && (
         <aside className="sidebar glass-panel" style={{ padding: '0.5rem' }}>
           <FilterBar 
             searchQuery={searchQuery} setSearchQuery={setSearchQuery}
@@ -131,7 +131,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
         )}
       </main>
 
-      {!globalSettings.showcaseMode && globalSettings.dashboardEnabled && isAdminView && (
+      {!globalSettings.showcaseMode && globalSettings.dashboardEnabled && (
         <aside className="sidebar">
           <Dashboard photocards={photocards} globalSettings={globalSettings} />
         </aside>
