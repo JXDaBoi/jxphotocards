@@ -15,6 +15,7 @@ export default function AddCardModal({ onClose }) {
   // Cropper settings
   const [aspect, setAspect] = useState(NaN); // NaN is free resize
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [dragMode, setDragMode] = useState('move'); // 'move' allows panning
   const [croppedBlob, setCroppedBlob] = useState(null);
 
   // Metadata
@@ -92,7 +93,10 @@ export default function AddCardModal({ onClose }) {
         {step === 'crop' && (
           <div style={{ display: 'flex', flexDirection: 'column', height: '700px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-              <h2>Frame & Drag</h2>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button className={`btn-secondary ${dragMode === 'move' ? 'active' : ''}`} onClick={() => setDragMode('move')}>✋ Pan Image</button>
+                  <button className={`btn-secondary ${dragMode === 'crop' ? 'active' : ''}`} onClick={() => setDragMode('crop')}>✂️ Draw Box</button>
+              </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button className={`btn-secondary ${isNaN(aspect) ? 'active' : ''}`} onClick={() => setAspect(NaN)}>Free Form</button>
                   <button className={`btn-secondary ${aspect === 3/4 ? 'active' : ''}`} onClick={() => setAspect(3/4)}>3:4 Vertical</button>
@@ -114,7 +118,7 @@ export default function AddCardModal({ onClose }) {
                 autoCropArea={1}
                 checkOrientation={false}
                 guides={true}
-                dragMode="crop"
+                dragMode={dragMode}
               />
             </div>
 
