@@ -104,7 +104,6 @@ export default function AddCardModal({ onClose }) {
               <Cropper
                 ref={cropperRef}
                 style={{ height: '100%', width: '100%' }}
-                zoomTo={1}
                 aspectRatio={aspect}
                 src={imageSrc}
                 viewMode={1}
