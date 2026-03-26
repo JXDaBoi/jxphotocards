@@ -17,7 +17,8 @@ export function usePhotocards() {
       setPhotocards(cards);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching photocards: ", error);
+      console.error("Error loading photocards:", error);
+      alert("Database Error: " + error.message + " (Make sure Firestore Rules allow reading!)");
       setLoading(false);
     });
 

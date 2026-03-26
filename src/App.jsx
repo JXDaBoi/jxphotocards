@@ -5,12 +5,15 @@ import AddCardModal from './components/AddCardModal';
 import './index.css';
 
 function App() {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('photocard-theme') || 'light';
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedTag, setSelectedTag] = useState(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('photocard-theme', theme);
   }, [theme]);
 
   return (
