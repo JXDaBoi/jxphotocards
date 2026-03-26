@@ -8,8 +8,8 @@ import LightboxModal from './LightboxModal';
 import { useState, useMemo } from 'react';
 import html2canvas from 'html2canvas';
 
-export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, globalSettings, isAdminView }) {
-  const { photocards, loading, deletePhotocard, updatePhotocard } = usePhotocards();
+export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, globalSettings, isAdminView, adminId }) {
+  const { photocards, loading, deletePhotocard, updatePhotocard } = usePhotocards(adminId);
   const { currentUser } = useAuth();
   const [editingCard, setEditingCard] = useState(null);
   const [filtersOpen, setFiltersOpen] = useState(false);

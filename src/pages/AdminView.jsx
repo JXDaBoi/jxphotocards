@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import GalleryGrid from '../components/GalleryGrid';
 import AddCardModal from '../components/AddCardModal';
+import { useSiteSettings } from '../hooks/useSiteSettings';
+import { db } from '../services/firebase';
+import { collection, query, getDocs, updateDoc, doc } from 'firebase/firestore';
 
-export default function AdminView({ theme, setTheme, settings }) {
+export default function AdminView() {
   const { currentUser, login } = useAuth();
+  const { globalSettings, loading } = useSiteSettings(currentUser?.uid);
+  const [theme, setTheme] = useState(() => localStorage.getItem('photocard-theme') || 'light');
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +28,26 @@ export default function AdminView({ theme, setTheme, settings }) {
       alert("Login failed: " + err.message);
     }
   };
+
+  const handleLegacyMigration = async () => {
+    if (!currentUser || !window.confirm("This will link all legacy unassigned cards to your account. Proceed?")) return;
+    try {
+       const q = query(collection(db, 'photocards'));
+       const snap = await getDocs(q);
+       const batchUpdates = snap.docs.filter(d => !d.data().ownerUid).map(d => updateDoc(doc(db, 'photocards', d.id), { ownerUid: currentUser.uid }));
+       await Promise.all(batchUpdates);
+       alert(`Migrated ${batchUpdates.length} legacy cards successfully to your Profile.`);
+    } catch (e) {
+       alert("Migration failed: " + e.message);
+    }
+  };
+
+  useEffect(() => {
+    if (!globalSettings) return;
+    const activeTheme = globalSettings.forceTheme !== 'user' ? globalSettings.forceTheme : theme;
+    document.documentElement.setAttribute('data-theme', activeTheme);
+    document.body.classList.remove('showcase-active'); // Admin bypass
+  }, [theme, globalSettings]);
 
   if (!currentUser) {
     return (
@@ -43,11 +68,12 @@ export default function AdminView({ theme, setTheme, settings }) {
   return (
     <div className="app-container">
       {/* Show admin controls perfectly without showcase hiding them */}
-      <Navbar theme={theme} toggleTheme={setTheme} isForcedTheme={settings.forceTheme !== 'user'} showAdminControls={true} setShowAddModal={setShowAddModal} />
+      <Navbar theme={theme} toggleTheme={setTheme} isForcedTheme={globalSettings?.forceTheme !== 'user'} showAdminControls={true} setShowAddModal={setShowAddModal} />
       
       <main>
-        <div style={{ marginBottom: '1rem', padding: '0.8rem 1.5rem', background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '8px', color: 'var(--text-main)', fontWeight: 'bold' }}>
-          🔒 You are viewing the dedicated Admin Portal. Showcase rules and hidden buttons are bypassed here.
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', padding: '0.8rem 1.5rem', background: 'rgba(59, 130, 246, 0.2)', border: '1px solid rgba(59, 130, 246, 0.4)', borderRadius: '8px', color: 'var(--text-main)', fontWeight: 'bold' }}>
+          <span>🔒 You are viewing the dedicated Admin Portal for UID: {currentUser.uid}</span>
+          <button className="action-btn" onClick={handleLegacyMigration} title="Claim Old Unassigned Cards" style={{ fontSize: '1.2rem', padding: '0 0.5rem' }}>♻️ CLAIM LEGACY CARDS</button>
         </div>
         <GalleryGrid 
           searchQuery={searchQuery}
@@ -56,8 +82,9 @@ export default function AdminView({ theme, setTheme, settings }) {
           setSearchQuery={setSearchQuery}
           setStatusFilter={setStatusFilter}
           setGroupFilter={setGroupFilter}
-          globalSettings={settings}
+          globalSettings={globalSettings}
           isAdminView={true}
+          adminId={currentUser.uid}
         />
       </main>
 

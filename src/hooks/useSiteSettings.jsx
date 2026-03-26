@@ -10,34 +10,55 @@ const defaultSettings = {
   tradeGeneratorEnabled: true,
 };
 
-export function useSiteSettings() {
-  const [settings, setSettings] = useState(defaultSettings);
-  const [loading, setLoading] = useState(true);
+export function useSiteSettings(userId) {
+  const [globalSettings, setGlobalSettings] = useState(defaultSettings);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true); // Re-introducing loading state for consistency
 
   useEffect(() => {
-    const docRef = doc(db, 'config', 'site_settings');
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    const docRef = doc(db, 'users', userId);
     
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        setSettings({ ...defaultSettings, ...docSnap.data() });
+        const data = docSnap.data();
+        setGlobalSettings({
+          ...defaultSettings,
+          ...data.settings
+        });
+        setProfile({
+          displayName: data.displayName || 'Unnamed Collector',
+          bio: data.bio || '',
+          ...data
+        });
       } else {
-        // If config doesn't exist yet, we initialize it automatically on first admin fetch
-        setSettings(defaultSettings);
+        setGlobalSettings(defaultSettings);
+        setProfile(null);
       }
       setLoading(false);
     }, (error) => {
-      console.error("Config Error:", error);
+      console.error("User Config Error:", error);
       setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [userId]);
 
-  const updateSettings = async (newSettings) => {
-    const updated = { ...settings, ...newSettings };
-    await setDoc(doc(db, 'config', 'site_settings'), updated, { merge: true });
-    setSettings(updated);
+  const updateSettings = async (newSettings, currentUserId) => {
+    if (!currentUserId) return;
+    const docRef = doc(db, 'users', currentUserId);
+    await setDoc(docRef, { settings: newSettings }, { merge: true });
   };
 
-  return { settings, loading, updateSettings };
+  const updateProfile = async (newProfileData, currentUserId) => {
+    if (!currentUserId) return;
+    const docRef = doc(db, 'users', currentUserId);
+    await setDoc(docRef, newProfileData, { merge: true });
+  };
+
+  return { globalSettings, profile, loading, updateSettings, updateProfile };
 }

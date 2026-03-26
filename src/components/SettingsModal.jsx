@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { useAuth } from '../hooks/useAuth';
 
 export default function SettingsModal({ onClose }) {
-  const { settings, updateSettings } = useSiteSettings();
+  const { currentUser } = useAuth();
+  const { globalSettings: settings, profile, updateSettings, updateProfile } = useSiteSettings(currentUser?.uid);
   
-  const [showcaseMode, setShowcaseMode] = useState(settings.showcaseMode);
-  const [dashboardEnabled, setDashboardEnabled] = useState(settings.dashboardEnabled);
-  const [forceTheme, setForceTheme] = useState(settings.forceTheme);
-  const [valueTrackerEnabled, setValueTrackerEnabled] = useState(settings.valueTrackerEnabled);
-  const [tradeGeneratorEnabled, setTradeGeneratorEnabled] = useState(settings.tradeGeneratorEnabled);
+  const [displayName, setDisplayName] = useState(profile?.displayName || '');
+  const [bio, setBio] = useState(profile?.bio || '');
+
+  const [showcaseMode, setShowcaseMode] = useState(settings?.showcaseMode || false);
+  const [dashboardEnabled, setDashboardEnabled] = useState(settings?.dashboardEnabled || true);
+  const [forceTheme, setForceTheme] = useState(settings?.forceTheme || 'user');
+  const [valueTrackerEnabled, setValueTrackerEnabled] = useState(settings?.valueTrackerEnabled || false);
+  const [tradeGeneratorEnabled, setTradeGeneratorEnabled] = useState(settings?.tradeGeneratorEnabled || true);
   const [saving, setSaving] = useState(false);
 
   // Sync to remote changes just in case
   useEffect(() => {
+    if (!settings) return;
     setShowcaseMode(settings.showcaseMode);
     setDashboardEnabled(settings.dashboardEnabled);
     setForceTheme(settings.forceTheme);
@@ -20,16 +26,23 @@ export default function SettingsModal({ onClose }) {
     setTradeGeneratorEnabled(settings.tradeGeneratorEnabled);
   }, [settings]);
 
+  useEffect(() => {
+    if (!profile) return;
+    setDisplayName(profile.displayName);
+    setBio(profile.bio);
+  }, [profile]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
+      await updateProfile({ displayName, bio }, currentUser?.uid);
       await updateSettings({
         showcaseMode,
         dashboardEnabled,
         forceTheme,
         valueTrackerEnabled,
         tradeGeneratorEnabled
-      });
+      }, currentUser?.uid);
       onClose();
     } catch (err) {
       alert("Failed to save settings: " + err.message);
@@ -40,13 +53,19 @@ export default function SettingsModal({ onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content glass-panel" style={{ maxWidth: '450px' }}>
-        <h2>⚙️ Global Site Settings</h2>
+      <div className="modal-content glass-panel" style={{ maxWidth: '450px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <h2>⚙️ Collector Profile & Settings</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-          These settings immediately sync and reflect for every public visitor landing on your database.
+          These settings actively sync to your specialized Collection Hub URL and control your public portfolio.
         </p>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+             <h4 style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Collection Profile</h4>
+             <input type="text" placeholder="Collection Display Name (e.g. Jennie's Hub)" value={displayName} onChange={e => setDisplayName(e.target.value)} className="input-field" style={{ marginBottom: '0.5rem' }} />
+             <input type="text" placeholder="Short Bio / Description" value={bio} onChange={e => setBio(e.target.value)} className="input-field" style={{ marginBottom: 0 }} />
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h4 style={{ marginBottom: '0.2rem' }}>Public Showcase Mode</h4>
