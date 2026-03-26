@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import GalleryGrid from './components/GalleryGrid';
 import AddCardModal from './components/AddCardModal';
+import FilterBar from './components/FilterBar';
 import './index.css';
 
 function App() {
@@ -9,7 +10,11 @@ function App() {
     return localStorage.getItem('photocard-theme') || 'light';
   });
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedTag, setSelectedTag] = useState(null);
+  
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [groupFilter, setGroupFilter] = useState('All');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -21,7 +26,14 @@ function App() {
       <Navbar theme={theme} toggleTheme={setTheme} setShowAddModal={setShowAddModal} />
 
       <main>
-        <GalleryGrid selectedTag={selectedTag} />
+        <GalleryGrid 
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          groupFilter={groupFilter}
+          setSearchQuery={setSearchQuery}
+          setStatusFilter={setStatusFilter}
+          setGroupFilter={setGroupFilter}
+        />
       </main>
 
       {showAddModal && <AddCardModal onClose={() => setShowAddModal(false)} />}

@@ -1,15 +1,28 @@
-export default function PhotocardItem({ card, onDelete }) {
+export default function PhotocardItem({ card, onDelete, onEdit }) {
+  const statusColors = {
+    'Owned': 'var(--accent)',
+    'Wishlist': '#ec4899',
+    'On the Way': '#f59e0b',
+    'Traded': '#64748b'
+  };
+
+  const statusColor = statusColors[card.status || 'Owned'];
+
   return (
     <div className="photocard-item glass-panel">
       <div className="image-wrapper">
         <img src={card.imageUrl} alt={card.name} loading="lazy" />
-        {onDelete && (
-          <button className="delete-btn" onClick={onDelete} title="Delete Card">
-            ×
-          </button>
-        )}
+        <div className="card-actions">
+            {onEdit && (
+              <button className="action-btn edit-btn" onClick={onEdit} title="Edit Card">✏️</button>
+            )}
+            {onDelete && (
+              <button className="action-btn delete-btn" onClick={onDelete} title="Delete Card">❌</button>
+            )}
+        </div>
       </div>
-      <div className="photocard-details">
+      <div className="photocard-details" style={{ position: 'relative' }}>
+        <span className="status-badge" style={{ backgroundColor: statusColor }}>{card.status || 'Owned'}</span>
         <h3>{card.name}</h3>
         {card.group && <p className="card-group">{card.group}</p>}
         {card.member && <p className="card-member">{card.member}</p>}

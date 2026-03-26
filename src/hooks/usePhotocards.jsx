@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, addDoc, deleteDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 export function usePhotocards() {
@@ -36,5 +36,9 @@ export function usePhotocards() {
     return await deleteDoc(doc(db, 'photocards', id));
   };
 
-  return { photocards, loading, addPhotocard, deletePhotocard };
+  const updatePhotocard = async (id, data) => {
+    return await updateDoc(doc(db, 'photocards', id), data);
+  };
+
+  return { photocards, loading, addPhotocard, deletePhotocard, updatePhotocard };
 }
