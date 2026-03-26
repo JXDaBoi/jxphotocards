@@ -12,8 +12,9 @@ export default function Dashboard({ photocards, globalSettings }) {
   const groups = new Set(photocards.map(c => c.group).filter(Boolean));
 
   return (
-    <div className="dashboard-panel glass-panel">
-      <div className="stat-box">
+    <div className="dashboard-container glass-panel">
+      <h3 style={{ marginBottom: '0.2rem', textAlign: 'center' }}>Analytics</h3>
+      <div className="stat-box" style={{ color: 'var(--accent)' }}>
         <h4>{total}</h4>
         <p>Total Cards</p>
       </div>

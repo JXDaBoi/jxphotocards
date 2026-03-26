@@ -18,7 +18,8 @@ export default function PhotocardItem({ card, onDelete, onEdit, globalSettings }
   return (
     <div className="photocard-item glass-panel">
       <div className="image-wrapper">
-        <img src={card.imageUrl} alt={card.name} loading="lazy" />
+        <img src={card.imageUrl} alt="" className="blur-bg" loading="lazy" />
+        <img src={card.imageUrl} alt={card.name} className="main-img" loading="lazy" />
         <div className="card-actions">
             {globalSettings?.tradeGeneratorEnabled && (card.status === 'Traded' || card.status === 'Wishlist' || card.status === 'Owned') && (
               <button className="action-btn trade-btn" onClick={handleTrade} title="Propose Trade">🤝</button>
