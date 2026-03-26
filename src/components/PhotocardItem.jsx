@@ -1,4 +1,4 @@
-export default function PhotocardItem({ card, onDelete, onEdit, globalSettings }) {
+export default function PhotocardItem({ card, onDelete, onEdit, globalSettings, onInspect }) {
   const statusColors = {
     'Owned': 'var(--accent)',
     'Wishlist': '#ec4899',
@@ -16,7 +16,7 @@ export default function PhotocardItem({ card, onDelete, onEdit, globalSettings }
   };
 
   return (
-    <div className="photocard-item glass-panel">
+    <div className="photocard-item glass-panel" onClick={onInspect ? () => onInspect(card) : undefined}>
       <div className="image-wrapper">
         <img src={card.imageUrl} alt="" className="blur-bg" loading="lazy" />
         <img src={card.imageUrl} alt={card.name} className="main-img" loading="lazy" />

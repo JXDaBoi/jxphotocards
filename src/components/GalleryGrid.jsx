@@ -4,7 +4,9 @@ import PhotocardItem from './PhotocardItem';
 import EditCardModal from './EditCardModal';
 import FilterBar from './FilterBar';
 import Dashboard from './Dashboard';
+import LightboxModal from './LightboxModal';
 import { useState, useMemo } from 'react';
+import html2canvas from 'html2canvas';
 
 export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, globalSettings, isAdminView }) {
   const { photocards, loading, deletePhotocard, updatePhotocard } = usePhotocards();
@@ -14,6 +16,8 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
   const [batchMode, setBatchMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState(new Set());
   const [gridSize, setGridSize] = useState('medium');
+  const [inspectedCard, setInspectedCard] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   const uniqueGroups = useMemo(() => {
     const groups = new Set(photocards.map(c => c.group).filter(Boolean));
@@ -52,6 +56,22 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
     }
   };
 
+  const handleExportWishlist = async () => {
+    setExporting(true);
+    try {
+      const el = document.getElementById('wishlist-export-container');
+      const canvas = await html2canvas(el, { useCORS: true, backgroundColor: '#111' });
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = 'wishlist.png';
+      link.href = imgData;
+      link.click();
+    } catch (e) {
+      alert("Export failed: " + e.message);
+    }
+    setExporting(false);
+  };
+
   return (
     <div className={!globalSettings.showcaseMode ? 'dashboard-layout' : ''}>
       
@@ -86,13 +106,18 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
             </div>
 
             {currentUser && isAdminView && (
-              <button 
-                className={`btn-secondary ${batchMode ? 'active' : ''}`} 
-                onClick={() => { setBatchMode(!batchMode); setSelectedCards(new Set()); }}
-                style={batchMode ? { background: 'var(--accent)', color: 'white' } : {}}
-              >
-                {batchMode ? 'Cancel Selection' : '⚡ Batch Edit'}
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn-secondary" onClick={handleExportWishlist} disabled={exporting}>
+                  {exporting ? '📸 Generating...' : '📸 Export Wishlist'}
+                </button>
+                <button 
+                  className={`btn-secondary ${batchMode ? 'active' : ''}`} 
+                  onClick={() => { setBatchMode(!batchMode); setSelectedCards(new Set()); }}
+                  style={batchMode ? { background: 'var(--accent)', color: 'white' } : {}}
+                >
+                  {batchMode ? 'Cancel Selection' : '⚡ Batch Edit'}
+                </button>
+              </div>
             )}
           </div>
         )}
@@ -123,6 +148,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
                     onDelete={currentUser && isAdminView && !batchMode ? () => deletePhotocard(card.id) : null} 
                     onEdit={currentUser && isAdminView && !batchMode ? () => setEditingCard(card) : null}
                     globalSettings={globalSettings}
+                    onInspect={setInspectedCard}
                   />
                 </div>
               );
@@ -137,7 +163,22 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
         </aside>
       )}
 
+      {/* Hidden container for HTML2Canvas Wishlist Generation */}
+      <div id="wishlist-export-container" style={{ position: 'absolute', top: '-9999px', width: '1000px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', background: '#111', padding: '30px', borderRadius: '15px' }}>
+        <h2 style={{ gridColumn: '1 / -1', color: 'white', textAlign: 'center', marginBottom: '10px', fontFamily: 'sans-serif' }}>💖 My Photocard Wishlist</h2>
+        {photocards.filter(c => c.status === 'Wishlist').map(c => (
+           <div key={c.id} style={{ background: '#222', padding: '10px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <img src={c.imageUrl} crossOrigin="anonymous" style={{ width: '100%', height: '300px', objectFit: 'contain', background: '#000', borderRadius: '5px' }} />
+              <div style={{ color: 'white', textAlign: 'center', fontFamily: 'sans-serif' }}>
+                 <strong style={{ fontSize: '14px' }}>{c.name}</strong>
+                 <p style={{ margin: 0, fontSize: '12px', color: '#aaa' }}>{c.group} {c.member}</p>
+              </div>
+           </div>
+        ))}
+      </div>
+
       {editingCard && <EditCardModal card={editingCard} onClose={() => setEditingCard(null)} />}
+      <LightboxModal card={inspectedCard} onClose={() => setInspectedCard(null)} />
     </div>
   );
 }
