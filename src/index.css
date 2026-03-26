@@ -127,5 +127,32 @@ body {
 .tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: auto;}
 .tag-badge { background: var(--bg-gradient); padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--glass-border); }
 
+/* Dashboard */
+.dashboard-panel { display: flex; flex-wrap: wrap; justify-content: space-around; gap: 1rem; padding: 1.5rem; margin-bottom: 2rem; }
+.stat-box { text-align: center; }
+.stat-box h4 { font-size: 1.8rem; margin-bottom: 0.2rem; }
+.stat-box p { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; opacity: 0.8; }
+
+/* Showcase Mode Cleanup */
+body.showcase-active .navbar, 
+body.showcase-active .status-badge, 
+body.showcase-active .card-actions, 
+body.showcase-active .delete-btn,
+body.showcase-active .edit-btn {
+  display: none !important;
+}
+
+body.showcase-active .gallery-grid {
+  gap: 1rem;
+}
+body.showcase-active .photocard-item {
+  box-shadow: none; border-radius: 0; border: none; background: transparent;
+}
+body.showcase-active .image-wrapper { border-radius: 0; }
+body.showcase-active { background: #111; color: white; }
+body.showcase-active .photocard-details { padding: 0.5rem; }
+body.showcase-active .card-group { color: #888; }
+body.showcase-active .tag-badge { background: #333; color: white; border: none; }
+
 /* Loaders & Empty */
 .loader, .empty-state { text-align: center; padding: 4rem; font-size: 1.2rem; color: var(--text-muted); font-weight: 500; }

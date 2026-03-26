@@ -12,14 +12,20 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   
   // Filter States
+  const [showcaseMode, setShowcaseMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [groupFilter, setGroupFilter] = useState('All');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (showcaseMode) {
+      document.body.classList.add('showcase-active');
+    } else {
+      document.body.classList.remove('showcase-active');
+    }
     localStorage.setItem('photocard-theme', theme);
-  }, [theme]);
+  }, [theme, showcaseMode]);
 
   return (
     <div className="app-container">
@@ -33,6 +39,8 @@ function App() {
           setSearchQuery={setSearchQuery}
           setStatusFilter={setStatusFilter}
           setGroupFilter={setGroupFilter}
+          showcaseMode={showcaseMode}
+          setShowcaseMode={setShowcaseMode}
         />
       </main>
 

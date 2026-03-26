@@ -3,12 +3,14 @@ import { useAuth } from '../hooks/useAuth';
 import PhotocardItem from './PhotocardItem';
 import EditCardModal from './EditCardModal';
 import FilterBar from './FilterBar';
+import Dashboard from './Dashboard';
 import { useState, useMemo } from 'react';
 
-export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter }) {
+export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter, setStatusFilter, groupFilter, setGroupFilter, showcaseMode, setShowcaseMode }) {
   const { photocards, loading, deletePhotocard } = usePhotocards();
   const { currentUser } = useAuth();
   const [editingCard, setEditingCard] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const uniqueGroups = useMemo(() => {
     const groups = new Set(photocards.map(c => c.group).filter(Boolean));
@@ -26,18 +28,39 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
     return matchSearch && matchStatus && matchGroup;
   });
 
-  if (filtered.length === 0) {
-    return <div className="empty-state">No photocards found. Add some to get started!</div>;
-  }
-
   return (
     <>
-      <FilterBar 
-        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
-        statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-        groupFilter={groupFilter} setGroupFilter={setGroupFilter}
-        uniqueGroups={uniqueGroups}
-      />
+      {!showcaseMode && <Dashboard photocards={photocards} />}
+      
+      {!showcaseMode && (
+        <div className="filter-container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+            <button className="btn-secondary" onClick={() => setFiltersOpen(!filtersOpen)}>
+              {filtersOpen ? 'Hide Filters ➖' : '🔍 Expand Search & Filters'}
+            </button>
+            <button className="btn-secondary" onClick={() => setShowcaseMode(true)} style={{ background: 'var(--accent)', color: 'white', border: 'none' }}>
+              📸 Enter Showcase Mode
+            </button>
+          </div>
+
+          {filtersOpen && (
+            <FilterBar 
+              searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+              statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+              groupFilter={groupFilter} setGroupFilter={setGroupFilter}
+              uniqueGroups={uniqueGroups}
+            />
+          )}
+        </div>
+      )}
+
+      {showcaseMode && (
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <button className="btn-secondary" onClick={() => setShowcaseMode(false)} style={{ fontSize: '1.2rem', padding: '1rem 2rem' }}>
+            🔙 Exit Showcase Mode
+          </button>
+        </div>
+      )}
       
       {filtered.length === 0 ? (
         <div className="empty-state">No photocards found matching your filters.</div>
