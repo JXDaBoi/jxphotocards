@@ -16,6 +16,9 @@ export function usePhotocards() {
       }));
       setPhotocards(cards);
       setLoading(false);
+    }, (error) => {
+      console.error("Error fetching photocards: ", error);
+      setLoading(false);
     });
 
     return unsubscribe;
