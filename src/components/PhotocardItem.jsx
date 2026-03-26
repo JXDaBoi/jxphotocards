@@ -25,10 +25,10 @@ export default function PhotocardItem({ card, onDelete, onEdit, globalSettings, 
               <button className="action-btn trade-btn" onClick={handleTrade} title="Propose Trade">🤝</button>
             )}
             {onEdit && (
-              <button className="action-btn edit-btn" onClick={onEdit} title="Edit Card">✏️</button>
+              <button className="action-btn edit-btn" onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit Card">✏️</button>
             )}
             {onDelete && (
-              <button className="action-btn delete-btn" onClick={onDelete} title="Delete Card">❌</button>
+              <button className="action-btn delete-btn" onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete Card">🗑️</button>
             )}
         </div>
       </div>
