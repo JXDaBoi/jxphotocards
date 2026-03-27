@@ -12,6 +12,7 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
   const { photocards, loading, deletePhotocard, updatePhotocard } = usePhotocards(adminId);
   const { currentUser } = useAuth();
   const [editingCard, setEditingCard] = useState(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [batchMode, setBatchMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState(new Set());
@@ -73,17 +74,26 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
   };
 
   return (
-    <div className={!globalSettings.showcaseMode ? 'dashboard-layout' : ''}>
+    <div className={!globalSettings?.showcaseMode ? 'dashboard-layout' : ''}>
       
-      {!globalSettings.showcaseMode && (
-        <aside className="sidebar glass-panel" style={{ padding: '0.5rem' }}>
-          <FilterBar 
-            searchQuery={searchQuery} setSearchQuery={setSearchQuery}
-            statusFilter={statusFilter} setStatusFilter={setStatusFilter}
-            groupFilter={groupFilter} setGroupFilter={setGroupFilter}
-            uniqueGroups={uniqueGroups}
-          />
-        </aside>
+      {!globalSettings?.showcaseMode && (
+        <>
+          <button 
+            className="btn-primary mobile-filter-toggle"
+            onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+          >
+            {mobileFiltersOpen ? '▲ Hide Advanced Tools' : '▼ Open Filters & Analytics'}
+          </button>
+
+          <aside className={`sidebar desktop-sidebar glass-panel ${mobileFiltersOpen ? 'mobile-open' : ''}`} style={{ padding: '0.5rem' }}>
+            <FilterBar 
+              searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+              statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+              groupFilter={groupFilter} setGroupFilter={setGroupFilter}
+              uniqueGroups={uniqueGroups}
+            />
+          </aside>
+        </>
       )}
 
       <main>
@@ -157,8 +167,8 @@ export default function GalleryGrid({ searchQuery, setSearchQuery, statusFilter,
         )}
       </main>
 
-      {!globalSettings.showcaseMode && globalSettings.dashboardEnabled && (
-        <aside className="sidebar">
+      {!globalSettings?.showcaseMode && globalSettings?.dashboardEnabled && (
+        <aside className={`sidebar desktop-sidebar ${mobileFiltersOpen ? 'mobile-open' : ''}`}>
           <Dashboard photocards={photocards} globalSettings={globalSettings} />
         </aside>
       )}
