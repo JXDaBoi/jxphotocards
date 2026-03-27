@@ -3,9 +3,11 @@ import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { uploadImageToCloudinary } from '../services/cloudinary';
 import { usePhotocards } from '../hooks/usePhotocards';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AddCardModal({ onClose }) {
   const { addPhotocard } = usePhotocards();
+  const { currentUser } = useAuth();
   const cropperRef = useRef(null);
   
   const [step, setStep] = useState('select');
@@ -67,7 +69,7 @@ export default function AddCardModal({ onClose }) {
       const fileToUpload = new File([croppedBlob], `photocard_${Date.now()}.jpg`, { type: 'image/jpeg' });
       const imageUrl = await uploadImageToCloudinary(fileToUpload);
       const tags = tagsInput.split(',').map(tag => tag.trim()).filter(Boolean);
-      await addPhotocard({ name, group, member, tags, status, price, imageUrl });
+      await addPhotocard({ name, group, member, tags, status, price, imageUrl }, currentUser?.uid);
       onClose();
     } catch (err) {
       alert("Error: " + err.message);
