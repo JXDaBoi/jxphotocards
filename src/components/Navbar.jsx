@@ -4,7 +4,7 @@ import SettingsModal from './SettingsModal';
 import { Link } from 'react-router-dom';
 
 export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTheme, showAdminControls }) {
-  const { logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [showSettings, setShowSettings] = useState(false);
 
   return (
@@ -31,7 +31,9 @@ export default function Navbar({ theme, toggleTheme, setShowAddModal, isForcedTh
                 <button className="btn-secondary" onClick={logout}>Logout</button>
               </>
             ) : (
-               <Link to="/admin" className="btn-secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>🛡️ Admin Gateway</Link>
+               <Link to={currentUser ? "/dashboard/collection" : "/login"} className="btn-secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                 🛡️ {currentUser ? "Dashboard" : "Admin Gateway"}
+               </Link>
             )}
           </div>
         </div>

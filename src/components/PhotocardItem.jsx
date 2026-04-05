@@ -1,4 +1,10 @@
-export default function PhotocardItem({ card, onDelete, onEdit, globalSettings, onInspect }) {
+import { useState } from 'react';
+import { useToast } from '../hooks/ToastContext';
+
+export default function PhotocardItem({ card, onDelete, onEdit, globalSettings, onInspect, isSelected, batchMode }) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const { addToast } = useToast();
+  
   const statusColors = {
     'Owned': 'var(--accent)',
     'Wishlist': '#ec4899',
@@ -12,14 +18,26 @@ export default function PhotocardItem({ card, onDelete, onEdit, globalSettings, 
     e.stopPropagation();
     const text = `Hi! I saw your Photocard Database. I am interested in trading for your ${card.name} (${card.group || ''} ${card.member || ''}). Let's talk!`;
     navigator.clipboard.writeText(text);
-    alert('✅ Trade request format copied to your clipboard!');
+    addToast('Trade request copied to clipboard!', 'success');
   };
 
   return (
-    <div className="photocard-item glass-panel" onClick={onInspect ? () => onInspect(card) : undefined}>
+    <div className={`photocard-item glass-panel ${isSelected ? 'selected' : ''} ${batchMode ? 'batch-selectable' : ''}`} onClick={onInspect && !batchMode ? () => onInspect(card) : undefined}>
       <div className="image-wrapper">
-        <img src={card.imageUrl} alt="" className="blur-bg" loading="lazy" />
-        <img src={card.imageUrl} alt={card.name} className="main-img" loading="lazy" />
+        {!imageLoaded && <div className="skeleton-loader" />}
+        <img 
+          src={card.imageUrl} 
+          alt="" 
+          className={`blur-bg ${imageLoaded ? 'loaded' : ''}`} 
+          loading="lazy" 
+        />
+        <img 
+          src={card.imageUrl} 
+          alt={card.name} 
+          className={`main-img ${imageLoaded ? 'loaded' : ''}`} 
+          loading="lazy" 
+          onLoad={() => setImageLoaded(true)}
+        />
         <div className="card-actions">
             {globalSettings?.tradeGeneratorEnabled && (card.status === 'Traded' || card.status === 'Wishlist' || card.status === 'Owned') && (
               <button className="action-btn trade-btn" onClick={handleTrade} title="Propose Trade">🤝</button>
